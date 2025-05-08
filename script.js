@@ -1,5 +1,8 @@
 let cy;
 
+// holds removed edges by label
+const removedEdgesMap = {};
+
 document.getElementById('fileInput').addEventListener('change', function (event) {
 	const file = event.target.files[0];
 	if (file) {
@@ -7,6 +10,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
 		reader.onload = function (e) {
 			const json = JSON.parse(e.target.result);
 			renderCytoscapeGraph(json, 'cola');
+			document.getElementById('tab-properties').textContent = "Select a node or edge to see its properties.";
 		};
 		reader.readAsText(file);
 	}
@@ -122,6 +126,8 @@ function renderCytoscapeGraph(json, layoutName) {
 	cy.on('unselect', () => {
 		document.getElementById('properties').textContent = "Select a node or edge to see its properties.";
 	});
+
+	updateEdgeLabelCheckboxes();
 }
 
 function createPropertiesTable(data) {
@@ -196,3 +202,55 @@ function hyphenateText(text) {
 	if (typeof text !== 'string') return text;
 	return text.replace(/\./g, ".&#8203;"); // Insert a zero-width space after each "."
 }
+
+function updateEdgeLabelCheckboxes() {
+	const container = document.getElementById('edge-filters');
+	const labels = [...new Set(cy.edges().map(e => e.data('label') || ''))];
+	container.innerHTML = '';
+	labels.forEach(label => {
+		const safe = label.replace(/[^a-z0-9]/gi, '-');
+		const id = `edge-label-${safe}`;
+		const li = document.createElement('li');
+		const cb = document.createElement('input');
+		cb.type = 'checkbox';
+		cb.id = id;
+		cb.checked = true;
+		cb.dataset.label = label;
+		cb.addEventListener('change', function () {
+			const label = this.dataset.label;
+			const sel = cy.edges(`[label = "${label}"]`);
+			if (!this.checked) {
+				// remove & store
+				removedEdgesMap[label] = sel.jsons();
+				cy.remove(sel);
+			} else {
+				// re-add & clear
+				const toRestore = removedEdgesMap[label] || [];
+				if (toRestore.length) {
+					cy.add(toRestore);
+					delete removedEdgesMap[label];
+					// after adding, re-layout just these edges if needed:
+					// cy.layout({ name: currentLayout, animate: true }).run();
+				}
+			}
+		});
+		const lbl = document.createElement('label');
+		lbl.htmlFor = id;
+		lbl.textContent = label || '(no label)';
+		li.append(cb, lbl);
+		container.append(li);
+	});
+}
+
+
+// Tab‐switching logic
+document.querySelectorAll('#properties .tab').forEach(tab => {
+	tab.addEventListener('click', () => {
+		// deactivate all tabs & panes
+		document.querySelectorAll('#properties .tab').forEach(t => t.classList.remove('active'));
+		document.querySelectorAll('#properties .tab-content').forEach(p => p.classList.remove('active'));
+		// activate clicked tab + its pane
+		tab.classList.add('active');
+		document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+	});
+});

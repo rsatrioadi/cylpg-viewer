@@ -65,3 +65,35 @@ table td {
 	white-space: normal;
 	/* Ensure wrapping occurs */
 }
+
+/* Sidebar tabs */
+#properties .tabs {
+	display: flex;
+	border-bottom: 1px solid #ccc;
+}
+
+#properties .tab {
+	flex: 1;
+	padding: 0.5rem;
+	background: #e0e0e0;
+	border: none;
+	cursor: pointer;
+	font-weight: 500;
+}
+
+#properties .tab.active {
+	background: #fff;
+	border-bottom: 2px solid #007bff;
+}
+
+#properties .tab-content {
+	display: none;
+	padding-top: 1rem;
+	height: calc(100% - 2.5rem);
+	/* adjust for tab header height */
+	overflow-y: auto;
+}
+
+#properties .tab-content.active {
+	display: block;
+}

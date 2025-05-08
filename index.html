@@ -26,7 +26,26 @@
 	</div>
 	<div id="main">
 		<div id="cy"></div>
-		<div id="properties">Select a node or edge to see its properties.</div>
+		<div id="properties">
+			<!-- Tabs -->
+			<div class="tabs">
+				<button class="tab active" data-tab="properties">Properties</button>
+				<button class="tab" data-tab="edge-filters">Edge Labels</button>
+			</div>
+		
+			<!-- Tab panes -->
+			<div class="tab-content active" id="tab-properties">
+				<!-- ⇨ move your existing #properties content here (the table or whatever you had) -->
+			</div>
+		
+			<div class="tab-content" id="tab-edge-filters">
+				<div id="edge-filter-container" style="padding: .5em 0;">
+					<h3 style="margin:0 0 .5em">Edge Labels</h3>
+					<ul id="edge-filters" style="list-style:none; padding-left:0;"></ul>
+				</div>
+			</div>
+		</div>
+
 	</div>
 	<script src="script.js"></script>
 </body>
