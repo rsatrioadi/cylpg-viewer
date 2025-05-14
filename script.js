@@ -64,6 +64,37 @@ function hashStringToHue(str) {
 	return (Math.abs(hash) % 18) * 20;
 }
 
+/**
+ * Turn any string into a reproducible RGB triple.
+ */
+function hashStringToRGB(str) {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	const r = (hash >> 0) & 0xFF;
+	const g = (hash >> 8) & 0xFF;
+	const b = (hash >> 16) & 0xFF;
+	return { r, g, b };
+}
+
+/**
+ * Map a string deterministically into H, S, L channels.
+ */
+function hashStringToHSL(str) {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	// Hue: 0–359
+	const h = (Math.abs(hash) % 40) * 9;
+	// Saturation: 40–99
+	const s = 40 + (Math.abs(hash >> 8) % 60);
+	// Lightness: 25–74
+	const l = 25 + (Math.abs(hash >> 16) % 50);
+	return { h, s, l };
+}
+
 function renderCytoscapeGraph(json, layoutName) {
 	const nodes = json.elements.nodes;
 	const edges = json.elements.edges;
@@ -85,11 +116,14 @@ function renderCytoscapeGraph(json, layoutName) {
 				style: {
 					'background-color': ele => {
 						const labels = ele.data('labels') || [];
-						const labelStr = labels.join('-');
-						const hue = hashStringToHue(labelStr);
-						return `hsl(${hue}, 90%, 60%)`;
+						const labelStr = labels.join('-') || '';
+						const { h, s, l } = hashStringToHSL(labelStr);
+						return `hsl(${h}, ${s}%, ${l}%)`;
 					},
-					'label': 'data(id)'
+					'border-width': 2,
+					'border-color': '#000',
+					'border-style': 'solid',
+					'label': (n) => n.data('properties.simpleName') || n.data('id')
 				}
 			},
 			{
@@ -117,14 +151,14 @@ function renderCytoscapeGraph(json, layoutName) {
 
 	cy.on('select', 'node, edge', event => {
 		const data = event.target.data();
-		const propertiesContainer = document.getElementById('properties');
+		const propertiesContainer = document.getElementById('tab-properties');
 		propertiesContainer.innerHTML = ''; // Clear previous content
 		const table = createPropertiesTable(data);
 		propertiesContainer.appendChild(table);
 	});
 
 	cy.on('unselect', () => {
-		document.getElementById('properties').textContent = "Select a node or edge to see its properties.";
+		document.getElementById('tab-properties').textContent = "Select a node or edge to see its properties.";
 	});
 
 	updateEdgeLabelCheckboxes();
@@ -135,7 +169,21 @@ function createPropertiesTable(data) {
 	table.style.borderCollapse = 'collapse';
 	table.style.width = '100%';
 
-	Object.entries(data).forEach(([key, value]) => {
+	const priority = ['id', 'source', 'target', 'labels', 'label', 'properties'];
+
+	const entries = [];
+	priority.forEach(k => {
+		if (data.hasOwnProperty(k)) {
+			entries.push([k, data[k]]);
+		}
+	});
+	Object.entries(data).forEach(([k, v]) => {
+		if (!priority.includes(k)) {
+			entries.push([k, v]);
+		}
+	});
+
+	entries.forEach(([key, value]) => {
 		const row = document.createElement('tr');
 		const cell = document.createElement('td');
 		const keyElement = document.createElement('h3');
