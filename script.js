@@ -56,6 +56,15 @@ document.getElementById('useKlay').addEventListener('click', function () {
 	}
 });
 
+document.getElementById('useDagre').addEventListener('click', function () {
+	if (cy) {
+		cy.layout({
+			name: 'dagre',
+			animate: true
+		}).run();
+	}
+});
+
 function hashStringToHue(str) {
 	let hash = 0;
 	for (let i = 0; i < str.length; i++) {
@@ -89,9 +98,9 @@ function hashStringToHSL(str) {
 	// Hue: 0–359
 	const h = (Math.abs(hash) % 40) * 9;
 	// Saturation: 40–99
-	const s = 40 + (Math.abs(hash >> 8) % 60);
+	const s = 40 + (Math.abs(hash >> 8) % 6) * 10;
 	// Lightness: 25–74
-	const l = 25 + (Math.abs(hash >> 16) % 50);
+	const l = 25 + (Math.abs(hash >> 16) % 5) * 10;
 	return { h, s, l };
 }
 

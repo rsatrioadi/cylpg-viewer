@@ -6,12 +6,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>cylpg-viewer</title>
 	<link rel="stylesheet" href="styles.css">
-	<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-	<script src="https://unpkg.com/webcola@3.4.0/WebCola/cola.js"></script>
-	<script src="https://unpkg.com/cytoscape-cola"></script>
-	<script src="https://unpkg.com/klayjs@0.4.1/klay.js"></script>
-	<script src="https://unpkg.com/cytoscape-klay@3.1.4/cytoscape-klay.js"></script>
-	<script src="https://unpkg.com/cytoscape-euler@1.2.2/cytoscape-euler.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/cytoscape/dist/cytoscape.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/webcola@3.4.0/WebCola/cola.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/cytoscape-cola"></script>
+	<script src="https://cdn.jsdelivr.net/npm/klayjs@0.4.1/klay.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/dagre@0.7.4/dist/dagre.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/cytoscape-klay@3.1.4/cytoscape-klay.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/cytoscape-euler@1.2.2/cytoscape-euler.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.4.0/cytoscape-dagre.min.js"></script>
 </head>
 
 <body>
@@ -20,9 +22,11 @@
 	</header>
 	<div id="controls">
 		<input type="file" id="fileInput" accept=".json">
-		<button id="useEuler">Use Euler Layout</button>
-		<button id="useCola">Use Cola Layout</button>
-		<button id="useKlay">Use Klay Layout</button>
+		Layout:
+		<button id="useEuler">Use Euler</button>
+		<button id="useCola">Use Cola</button>
+		<button id="useKlay">Use Klay</button>
+		<button id="useDagre">Use Dagre</button>
 	</div>
 	<div id="main">
 		<div id="cy"></div>
